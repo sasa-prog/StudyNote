@@ -6,6 +6,22 @@ interface MyPluginSettings {
 	mySetting: string;
 }
 
+enum Subject {
+	Math = 'Math',
+	English = 'English',
+	Art = 'Art',
+	Music = 'Music',
+	PhysicalEducation = 'Physical Education',
+	History = 'History',
+	Geography = 'Geography',
+	Chemistry = 'Chemistry',
+	Physics = 'Physics',
+	Other = 'Other',
+	Biology = 'Biology',
+	Science = 'Science',
+	LanguageArts = 'Language Arts'
+}
+
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	mySetting: 'default'
 }
@@ -33,7 +49,7 @@ export default class MyPlugin extends Plugin {
 			id: 'open-sample-modal-simple',
 			name: 'Open sample modal (simple)',
 			callback: () => {
-				new SampleModal(this.app).open();
+				new StudyStartModal(this.app).open();
 			}
 		});
 		// This adds an editor command that can perform some operation on the current editor instance
@@ -56,7 +72,7 @@ export default class MyPlugin extends Plugin {
 					// If checking is true, we're simply "checking" if the command can be run.
 					// If checking is false, then we want to actually perform the operation.
 					if (!checking) {
-						new SampleModal(this.app).open();
+						new StudyStartModal(this.app).open();
 					}
 
 					// This command will only show up in Command Palette when the check function returns true
@@ -91,9 +107,40 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
+class StudyStartModal extends Modal {
 	constructor(app: App) {
 		super(app);
+		this.setTitle('Study Start');
+		this.contentEl.appendChild(document.createElement('p')).setText('Select a subject to start your study session:');
+		new Setting(this.contentEl).addDropdown(dropdown => {
+			dropdown
+				.addOption(Subject.Math, 'Math')
+				.addOption(Subject.English, 'English')
+				.addOption(Subject.Art, 'Art')
+				.addOption(Subject.Music, 'Music')
+				.addOption(Subject.PhysicalEducation, 'Physical Education')
+				.addOption(Subject.History, 'History')
+				.addOption(Subject.Geography, 'Geography')
+				.addOption(Subject.Chemistry, 'Chemistry')
+				.addOption(Subject.Physics, 'Physics')
+				.addOption(Subject.Other, 'Other')
+				.addOption(Subject.Biology, 'Biology')
+				.addOption(Subject.Science, 'Science')
+				.addOption(Subject.LanguageArts, 'Language Arts');
+			dropdown.setValue(Subject.Math);
+			dropdown.onChange((value) => {
+				console.log('Selected subject:', value);
+			});
+		});
+		new Setting(this.contentEl).addButton(button => {
+			button
+				.setButtonText('Start')
+				.setCta()
+				.onClick(() => {
+					new Notice('Study session started!');
+					this.close();
+				});
+		});
 	}
 
 	onOpen() {
@@ -132,3 +179,4 @@ class SampleSettingTab extends PluginSettingTab {
 				}));
 	}
 }
+
